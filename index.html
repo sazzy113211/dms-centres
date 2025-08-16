@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>D.M.S CENTRE - Game Top-Up</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .logo {
+      font-size: 60px;
+      margin-top: 40px;
+      text-shadow: 0 0 10px #00ffe0, 0 0 20px #00ffe0, 0 0 40px #00b3ff;
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px #ff00d9, 0 0 10px #ff00d9, 0 0 20px #ff00d9, 0 0 40px #ff0077;
+        color: #fff;
+      }
+      to {
+        text-shadow: 0 0 10px #00ffe0, 0 0 20px #00ffe0, 0 0 40px #00b3ff, 0 0 80px #00b3ff;
+        color: #e6ffff;
+      }
+    }
+    .container {
+      margin-top: 30px;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #00b3ff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0099cc;
+    }
+    .products {
+      margin-top: 20px;
+    }
+    .footer {
+      margin-top: 60px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .footer span {
+      color: #00ffe0;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="logo">✨ D.M.S CENTRE ✨</h1>
+  <h3>Your trusted place for Free Fire top-ups</h3>
+
+  <div class="container">
+    <label>Player ID:</label><br>
+    <input id="playerId" placeholder="Enter your Free Fire ID"><br>
+
+    <label>Currency:</label><br>
+    <input id="currency" value="NGN"><br>
+
+    <button onclick="load()">Show Products</button>
+  </div>
+
+  <div id="products" class="products"></div>
+
+  <div class="footer">
+    Powered by <span>D.M.S CENTRE</span> | All Rights Reserved © 2025
+  </div>
+
+<script>
+async function load(){
+  let cur=document.getElementById("currency").value;
+  let res=await fetch(`/products?currency=${cur}`);
+  let items=await res.json();
+  let html="<h2>Available Top-Ups</h2>";
+  items.forEach(p=>{
+    html+=`<button onclick="order(${p.id},'${cur}')">
+              ${p.diamonds} Diamonds — ${p.price} ${p.currency}
+           </button><br/>`;
+  });
+  document.getElementById("products").innerHTML=html;
+}
+async function order(pid,curr){
+  let playerId=document.getElementById("playerId").value;
+  if(!playerId){ alert("Enter your Player ID first!"); return; }
+  let res=await fetch("/order",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({product_id:pid,player_id:playerId,currency:curr,email:"user@example.com"})});
+  let o=await res.json();
+  window.location=o.payment_link;
+}
+</script>
+</body>
+</html>
